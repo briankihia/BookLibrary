@@ -21,7 +21,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<LoginPage />} />
-        <Route path="/register" element={<Layout><RegistrationPage /></Layout>} />
+        <Route path="/register" element={<RegistrationPage />} />
         <Route path="/books" element={<Layout><BookList /></Layout>} />
         <Route path="/books/:id" element={<Layout><BookDetail /></Layout>} />
         <Route path="/books/add" element={<Layout><AddBook /></Layout>} />

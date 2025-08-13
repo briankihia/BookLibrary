@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { fetchBook, fetchRatings, addRating, fetchFavorites, addFavorite, removeFavorite } from '../api/api';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
+import axiosInstance from '../pages/axios';
 
 function BookDetail() {
   const { id } = useParams();
@@ -9,6 +10,15 @@ function BookDetail() {
   const [favoriteBooks, setFavoriteBooks] = useState([]);
   const [ratingValue, setRatingValue] = useState(5);
   const [reviewText, setReviewText] = useState('');
+  const [user, setUser] = useState(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const storedUser = JSON.parse(localStorage.getItem('user'));
+    if (storedUser) {
+      setUser(storedUser);
+    }
+  }, []);
 
   const loadBook = async () => {
     const res = await fetchBook(id);
@@ -51,6 +61,18 @@ function BookDetail() {
     loadFavorites();
   };
 
+  const handleDeleteBook = async () => {
+    if (window.confirm('Are you sure you want to delete this book?')) {
+      try {
+        await axiosInstance.delete(`/api/books/${book.id}/`);
+        navigate('/books');
+      } catch (err) {
+        console.error(err);
+        alert('Error deleting book.');
+      }
+    }
+  };
+
   if (!book) return <p>Loading...</p>;
 
   return (
@@ -60,6 +82,15 @@ function BookDetail() {
       <p><b>Genre:</b> {book.genre.name}</p>
       <p><b>Year:</b> {book.publish_year}</p>
       <p>{book.description}</p>
+
+      {user && book.user && user.id === book.user.id && (
+        <button
+          onClick={handleDeleteBook}
+          style={{ background: 'red', color: 'white', padding: '5px 10px', marginBottom: '10px' }}
+        >
+          Delete Book
+        </button>
+      )}
 
       <button onClick={toggleFavorite}>
         {favoriteBooks.includes(book.id) ? 'Remove from Favorites' : 'Add to Favorites'}

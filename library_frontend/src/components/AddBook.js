@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { fetchAuthors, fetchGenres, createBook } from '../api/api'; // Adjust the import path as necessary
+import { fetchAuthors, fetchGenres, createBook } from '../api/api';
 import { useNavigate } from 'react-router-dom';
 
 function AddBook() {
@@ -12,6 +12,7 @@ function AddBook() {
   const [authors, setAuthors] = useState([]);
   const [genres, setGenres] = useState([]);
   const [error, setError] = useState('');
+  const [user, setUser] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -22,10 +23,17 @@ function AddBook() {
       setGenres(g.data);
     };
     loadAuthorsAndGenres();
+
+    const storedUser = JSON.parse(localStorage.getItem('user'));
+    if (storedUser) {
+      setUser(storedUser);
+    }
   }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!user) return alert('You must be logged in to add a book');
+
     try {
       await createBook({
         title,
@@ -34,6 +42,7 @@ function AddBook() {
         description,
         author_id: authorId,
         genre_id: genreId,
+        user_id: user.id, // attach current user
       });
       navigate('/books');
     } catch (err) {
