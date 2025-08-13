@@ -11,9 +11,9 @@ import Layout from './components/Layout';
 // import ShipmentManagement from "./pages/ShipmentManagement"; // Assuming you have a ShipmentManagement component
 // import Dashboard from "./pages/Dashboard";
 import RegistrationPage from "./pages/RegistrationPage/RegistrationPage";
-// import BookList from "./components/BookList";
-// import BookDetail from "./components/BookDetail";
-// import AddBook from "./components/AddBook";
+import BookList from "./components/BookList";
+import BookDetail from "./components/BookDetail";
+import AddBook from "./components/AddBook";
 
 
 function App() {
@@ -21,12 +21,15 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<LoginPage />} />
-        <Route path="/register" element={<RegistrationPage />} />
-         {/* <Route
+        <Route path="/register" element={<Layout><RegistrationPage /></Layout>} />
+        <Route path="/books" element={<Layout><BookList /></Layout>} />
+        <Route path="/books/:id" element={<Layout><BookDetail /></Layout>} />
+        <Route path="/books/add" element={<Layout><AddBook /></Layout>} />
+        {/* <Route
             path="/"
             element={user ? <BookList /> : <Navigate to="/login" />}
-          />
-        <Route
+          /> */}
+        {/* <Route
             path="/books/add"
             element={user ? <AddBook /> : <Navigate to="/login" />}
           />

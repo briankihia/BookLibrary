@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { fetchAuthors, fetchGenres, createBook } from './api';
+import { fetchAuthors, fetchGenres, createBook } from '../api/api'; // Adjust the import path as necessary
 import { useNavigate } from 'react-router-dom';
 
 function AddBook() {
@@ -35,7 +35,7 @@ function AddBook() {
         author_id: authorId,
         genre_id: genreId,
       });
-      navigate('/');
+      navigate('/books');
     } catch (err) {
       setError('Error adding book. Check your data.');
     }

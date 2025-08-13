@@ -31,17 +31,17 @@ const Navbar = () => {
     <AppBar position="static">
       <Toolbar>
         <Typography variant="h6" sx={{ flexGrow: 1 }}>
-          Cargo Management System
+          Book Library System
         </Typography>
 
         {/* Common Links */}
-        <Button color="inherit" onClick={() => navigate('/dashboard')}>Dashboard</Button>
+        {/* <Button color="inherit" onClick={() => navigate('/dashboard')}>Dashboard</Button>
         <Button color="inherit" onClick={() => navigate('/crew')}>Crew</Button>
         <Button color="inherit" onClick={() => navigate('/ports')}>Ports</Button>
         <Button color="inherit" onClick={() => navigate('/ships')}>Ships</Button>
         <Button color="inherit" onClick={() => navigate('/cargo')}>Cargo</Button>
         <Button color="inherit" onClick={() => navigate('/shipments')}>Shipments</Button>
-        <Button color="inherit" onClick={() => navigate('/clients')}>Clients</Button>
+        <Button color="inherit" onClick={() => navigate('/clients')}>Clients</Button> */}
 
         {/* Admin-only Links */}
         {isAdmin && (

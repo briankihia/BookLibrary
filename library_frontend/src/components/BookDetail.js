@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { fetchBook, fetchRatings, addRating, fetchFavorites, addFavorite, removeFavorite } from './api';
+import { fetchBook, fetchRatings, addRating, fetchFavorites, addFavorite, removeFavorite } from '../api/api';
 import { useParams } from 'react-router-dom';
 
 function BookDetail() {

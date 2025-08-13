@@ -64,9 +64,9 @@ function LoginForm() {
       // Redirect based on role
       const storedUser = JSON.parse(localStorage.getItem('user'));
       if (storedUser?.role === 'admin') {
-        navigate('/dashboard');
+        navigate('/books');
       } else {
-        navigate('/dashboard');
+        navigate('/books');
       }
     } else {
       setError(result.message);
