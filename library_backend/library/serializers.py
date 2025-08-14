@@ -27,14 +27,17 @@ class BookSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
     author = AuthorSerializer(read_only=True)
     genre = GenreSerializer(read_only=True)
-    author_id = serializers.PrimaryKeyRelatedField(queryset=Author.objects.all(), source='author', write_only=True)
-    genre_id = serializers.PrimaryKeyRelatedField(queryset=Genre.objects.all(), source='genre', write_only=True)
+
+    author_name = serializers.CharField(write_only=True)
+    genre_name = serializers.CharField(write_only=True)
 
     class Meta:
         model = Book
-        fields = ['id', 'title', 'isbn', 'publish_year', 'description',
-                  'author', 'genre', 'author_id', 'genre_id', 'user',
-                  'created_at', 'updated_at']
+        fields = [
+            'id', 'title', 'isbn', 'publish_year', 'description',
+            'author', 'genre', 'author_name', 'genre_name', 'user',
+            'created_at', 'updated_at'
+        ]
 
     def validate_publish_year(self, value):
         import datetime
@@ -44,8 +47,19 @@ class BookSerializer(serializers.ModelSerializer):
         return value
 
     def create(self, validated_data):
+        # Extract and process author and genre names
+        author_name = validated_data.pop('author_name')
+        genre_name = validated_data.pop('genre_name')
+
+        author, _ = Author.objects.get_or_create(name=author_name)
+        genre, _ = Genre.objects.get_or_create(name=genre_name)
+
+        validated_data['author'] = author
+        validated_data['genre'] = genre
         validated_data['user'] = self.context['request'].user
+
         return super().create(validated_data)
+
 
 class RatingSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
@@ -63,6 +77,7 @@ class RatingSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         validated_data['user'] = self.context['request'].user
         return super().create(validated_data)
+
 
 class FavoriteSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)

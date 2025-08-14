@@ -1,23 +1,22 @@
+// src/pages/BookDetail.js
 import React, { useState, useEffect } from 'react';
-import { fetchBook, fetchRatings, addRating, fetchFavorites, addFavorite, removeFavorite } from '../api/api';
+import { fetchBook, fetchRatings, addRating, fetchFavorites, addFavorite, removeFavorite, deleteBook } from '../api/api';
 import { useParams, useNavigate } from 'react-router-dom';
-import axiosInstance from '../pages/axios';
 
 function BookDetail() {
   const { id } = useParams();
+  const navigate = useNavigate();
+
   const [book, setBook] = useState(null);
   const [ratings, setRatings] = useState([]);
   const [favoriteBooks, setFavoriteBooks] = useState([]);
   const [ratingValue, setRatingValue] = useState(5);
   const [reviewText, setReviewText] = useState('');
-  const [user, setUser] = useState(null);
-  const navigate = useNavigate();
+  const [me, setMe] = useState(null);
 
   useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem('user'));
-    if (storedUser) {
-      setUser(storedUser);
-    }
+    const u = JSON.parse(localStorage.getItem('user'));
+    if (u) setMe(u);
   }, []);
 
   const loadBook = async () => {
@@ -53,6 +52,7 @@ function BookDetail() {
   };
 
   const toggleFavorite = async () => {
+    if (!book) return;
     if (favoriteBooks.includes(book.id)) {
       await removeFavorite(book.id);
     } else {
@@ -61,15 +61,20 @@ function BookDetail() {
     loadFavorites();
   };
 
-  const handleDeleteBook = async () => {
-    if (window.confirm('Are you sure you want to delete this book?')) {
-      try {
-        await axiosInstance.delete(`/api/books/${book.id}/`);
-        navigate('/books');
-      } catch (err) {
-        console.error(err);
-        alert('Error deleting book.');
-      }
+  const isOwner = () => {
+    if (!me || !book || !book.user) return false;
+    const userId = typeof book.user === 'number' ? book.user : book.user.id;
+    return userId === me.id;
+  };
+
+  const handleDelete = async () => {
+    if (!window.confirm('Delete this book?')) return;
+    try {
+      await deleteBook(book.id);
+      navigate('/books');
+    } catch (e) {
+      console.error(e);
+      alert('Error deleting book.');
     }
   };
 
@@ -83,10 +88,10 @@ function BookDetail() {
       <p><b>Year:</b> {book.publish_year}</p>
       <p>{book.description}</p>
 
-      {user && book.user && user.id === book.user.id && (
+      {isOwner() && (
         <button
-          onClick={handleDeleteBook}
-          style={{ background: 'red', color: 'white', padding: '5px 10px', marginBottom: '10px' }}
+          onClick={handleDelete}
+          style={{ background: '#ef4444', color: 'white', border: 'none', padding: '6px 12px', borderRadius: 6, marginRight: 8 }}
         >
           Delete Book
         </button>
