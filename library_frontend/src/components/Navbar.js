@@ -1,31 +1,64 @@
-import React, { useEffect, useState } from 'react';
-import { AppBar, Toolbar, Typography, Button } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import React, { useEffect, useState } from "react";
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  Button,
+  IconButton,
+  Menu,
+  MenuItem,
+  useMediaQuery
+} from "@mui/material";
+import MenuIcon from "@mui/icons-material/Menu";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { useTheme } from "@mui/material/styles";
 
 const Navbar = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
+
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md")); // md covers tablet + phone
 
   useEffect(() => {
-    const session = JSON.parse(localStorage.getItem('session'));
+    const session = JSON.parse(localStorage.getItem("session"));
     if (session?.token) {
-      axios.defaults.headers.common['Authorization'] = `Bearer ${session.token}`;
+      axios.defaults.headers.common["Authorization"] = `Bearer ${session.token}`;
       setUser(session.user);
     } else {
-      alert('You must be logged in to view this page');
-      window.location.href = '/login';
+      alert("You must be logged in to view this page");
+      window.location.href = "/login";
     }
   }, []);
 
   const logout = () => {
-    localStorage.removeItem('access');
-    localStorage.removeItem('refresh');
-    localStorage.removeItem('session');
-    navigate('/');
+    localStorage.removeItem("access");
+    localStorage.removeItem("refresh");
+    localStorage.removeItem("session");
+    navigate("/");
   };
 
-  const isAdmin = user?.role?.toLowerCase() === 'admin';
+  const isAdmin = user?.role?.toLowerCase() === "admin";
+
+  const handleMenuOpen = (event) => setAnchorEl(event.currentTarget);
+  const handleMenuClose = () => setAnchorEl(null);
+
+  const menuLinks = [
+    { label: "Dashboard", path: "/dashboard" },
+    { label: "Crew", path: "/crew" },
+    { label: "Ports", path: "/ports" },
+    { label: "Ships", path: "/ships" },
+    { label: "Cargo", path: "/cargo" },
+    { label: "Shipments", path: "/shipments" },
+    { label: "Clients", path: "/clients" }
+  ];
+
+  const adminLinks = [
+    { label: "Admin Dashboard", path: "/admin-dashboard" },
+    { label: "Manage Users", path: "/users" }
+  ];
 
   return (
     <AppBar position="static">
@@ -34,25 +67,75 @@ const Navbar = () => {
           Book Library System
         </Typography>
 
-        {/* Common Links */}
-        {/* <Button color="inherit" onClick={() => navigate('/dashboard')}>Dashboard</Button>
-        <Button color="inherit" onClick={() => navigate('/crew')}>Crew</Button>
-        <Button color="inherit" onClick={() => navigate('/ports')}>Ports</Button>
-        <Button color="inherit" onClick={() => navigate('/ships')}>Ships</Button>
-        <Button color="inherit" onClick={() => navigate('/cargo')}>Cargo</Button>
-        <Button color="inherit" onClick={() => navigate('/shipments')}>Shipments</Button>
-        <Button color="inherit" onClick={() => navigate('/clients')}>Clients</Button> */}
-
-        {/* Admin-only Links */}
-        {isAdmin && (
+        {isMobile ? (
           <>
-            {/* <Button color="inherit" onClick={() => navigate('/admin-dashboard')}>Admin Dashboard</Button> */}
-            {/* <Button color="inherit" onClick={() => navigate('/users')}>Manage Users</Button> */}
+            <IconButton color="inherit" onClick={handleMenuOpen}>
+              <MenuIcon />
+            </IconButton>
+            <Menu
+              anchorEl={anchorEl}
+              open={Boolean(anchorEl)}
+              onClose={handleMenuClose}
+            >
+              {menuLinks.map((link) => (
+                <MenuItem
+                  key={link.path}
+                  onClick={() => {
+                    navigate(link.path);
+                    handleMenuClose();
+                  }}
+                >
+                  {link.label}
+                </MenuItem>
+              ))}
+              {isAdmin &&
+                adminLinks.map((link) => (
+                  <MenuItem
+                    key={link.path}
+                    onClick={() => {
+                      navigate(link.path);
+                      handleMenuClose();
+                    }}
+                  >
+                    {link.label}
+                  </MenuItem>
+                ))}
+              <MenuItem
+                onClick={() => {
+                  logout();
+                  handleMenuClose();
+                }}
+              >
+                Logout
+              </MenuItem>
+            </Menu>
+          </>
+        ) : (
+          <>
+            {menuLinks.map((link) => (
+              <Button
+                key={link.path}
+                color="inherit"
+                onClick={() => navigate(link.path)}
+              >
+                {link.label}
+              </Button>
+            ))}
+            {isAdmin &&
+              adminLinks.map((link) => (
+                <Button
+                  key={link.path}
+                  color="inherit"
+                  onClick={() => navigate(link.path)}
+                >
+                  {link.label}
+                </Button>
+              ))}
+            <Button color="inherit" onClick={logout}>
+              Logout
+            </Button>
           </>
         )}
-
-        {/* Logout */}
-        <Button color="inherit" onClick={logout}>Logout</Button>
       </Toolbar>
     </AppBar>
   );
